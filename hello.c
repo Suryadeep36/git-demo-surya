@@ -1,6 +1,6 @@
 #include <stdio.h>
 
 int main(){
-  printf("Hello From Main Project!\n");
+  printf("Hello From Networking Project!\n");
   return 0;
 }
