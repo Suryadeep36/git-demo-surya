@@ -1,6 +1,6 @@
 #include <stdio.h>
 
 int main(){
-  printf("Hello From Main Project!\n");
+  //remove printf
   return 0;
 }
