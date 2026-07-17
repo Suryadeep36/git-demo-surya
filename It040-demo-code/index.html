@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pure CSS Car Animation</title>
+    <style>
+        /* --- Reset & Base Styles --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #1a1a2e;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* --- Stage / Container --- */
+        .stage {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(to bottom, #1f4068, #162447);
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- Skyline Background (Infinite Loop) --- */
+        .skyline {
+            position: absolute;
+            bottom: 80px;
+            width: 200%;
+            height: 150px;
+            background-image: radial-gradient(circle at 100px 150px, #e94560 10%, transparent 11%),
+                              linear-gradient(to top, #162447, transparent);
+            background: repeating-linear-gradient(
+                90deg,
+                #0f172a 0px,
+                #0f172a 40px,
+                #1e293b 40px,
+                #1e293b 80px,
+                #0f172a 80px,
+                #0f172a 150px,
+                #334155 150px,
+                #334155 180px
+            );
+            background-size: 400px 150px;
+            opacity: 0.5;
+            animation: driveBackground 12s linear infinite;
+        }
+
+        /* --- Road --- */
+        .road {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background: #222;
+            border-top: 5px solid #e94560;
+        }
+
+        .road-lines {
+            position: absolute;
+            top: 50%;
+            width: 200%;
+            height: 6px;
+            background: repeating-linear-gradient(
+                90deg,
+                #fff 0px,
+                #fff 30px,
+                transparent 30px,
+                transparent 80px
+            );
+            transform: translateY(-50%);
+            animation: driveBackground 1.5s linear infinite;
+        }
+
+        /* --- The Car --- */
+        .car-container {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            height: 100px;
+            animation: carSuspension 0.4s ease-in-out infinite alternate;
+        }
+
+        .car-body {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            height: 50px;
+            background: #e94560;
+            border-radius: 15px 30px 10px 5px;
+        }
+
+        /* Car Cabin / Roof */
+        .car-cabin {
+            position: absolute;
+            bottom: 65px;
+            left: 45px;
+            width: 130px;
+            height: 35px;
+            background: #e94560;
+            border-radius: 30px 40px 0 0;
+        }
+
+        /* Windows */
+        .car-cabin::before, .car-cabin::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            height: 30px;
+            background: #fff;
+            opacity: 0.8;
+        }
+
+        .car-cabin::before {
+            left: 10px;
+            width: 50px;
+            border-radius: 20px 0 0 0;
+        }
+
+        .car-cabin::after {
+            right: 10px;
+            width: 55px;
+            border-radius: 0 25px 0 0;
+        }
+
+        /* Lights */
+        .headlight {
+            position: absolute;
+            right: 0;
+            top: 15px;
+            width: 10px;
+            height: 15px;
+            background: #fffbdf;
+            border-radius: 0 5px 5px 0;
+            box-shadow: 15px 0px 15px rgba(255, 251, 223, 0.8);
+        }
+
+        .taillight {
+            position: absolute;
+            left: 0;
+            top: 15px;
+            width: 6px;
+            height: 15px;
+            background: #ff0000;
+            border-radius: 3px 0 0 3px;
+        }
+
+        /* Wheels */
+        .wheel {
+            position: absolute;
+            bottom: 5px;
+            width: 44px;
+            height: 44px;
+            background: #111;
+            border-radius: 50%;
+            border: 3px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wheel-front {
+            right: 35px;
+        }
+
+        .wheel-back {
+            left: 35px;
+        }
+
+        /* Hubcaps (Spokes) */
+        .hubcap {
+            width: 24px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 50%;
+            position: relative;
+            animation: spin 0.6s linear infinite;
+        }
+
+        /* Wheel spokes lines */
+        .hubcap::before, .hubcap::after {
+            content: '';
+            position: absolute;
+            background: #444;
+        }
+
+        .hubcap::before {
+            top: 0;
+            left: 11px;
+            width: 2px;
+            height: 100%;
+        }
+
+        .hubcap::after {
+            top: 11px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+        }
+
+        /* --- Animations --- */
+
+        /* 1. Rotates the wheels */
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 2. Moves the background & road lines backward to simulate forward motion */
+        @keyframes driveBackground {
+            100% {
+                background-position: -400px 0;
+            }
+        }
+
+        /* 3. Gives the car a realistic micro-bounce (suspension vibration) */
+        @keyframes carSuspension {
+            0% {
+                transform: translateX(-50%) translateY(0);
+            }
+            100% {
+                transform: translateX(-50%) translateY(-2px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stage">
+        <!-- Moving Skyline/Background Elements -->
+        <div class="skyline"></div>
+
+        <!-- The Road with Moving Lines -->
+        <div class="road">
+            <div class="road-lines"></div>
+        </div>
+
+        <!-- The Animated Car -->
+        <div class="car-container">
+            <div class="car-cabin"></div>
+            <div class="car-body">
+                <div class="headlight"></div>
+                <div class="taillight"></div>
+            </div>
+            
+            <!-- Front Wheel -->
+            <div class="wheel wheel-front">
+                <div class="hubcap"></div>
+            </div>
+            
+            <!-- Back Wheel -->
+            <div class="wheel wheel-back">
+                <div class="hubcap"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
