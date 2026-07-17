@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstroPhysics Space Sandbox - Celestial Mechanics & Alchemy</title>
+  <!-- Google Fonts: Orbitron for scientific tags, Inter for clean layout -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Canvas representing deep space -->
+  <canvas id="spaceCanvas"></canvas>
+
+  <!-- Sound status toggle -->
+  <button id="soundToggle" class="sound-btn muted" title="Toggle cosmic synthesizer">
+    <span class="icon">🔇</span>
+    <span class="text">Muted</span>
+  </button>
+
+  <!-- Left Control Panel -->
+  <aside id="controlsPanel" class="glass-panel left-panel">
+    <div class="panel-header">
+      <h1>ASTROPHYSICS</h1>
+      <span class="sub-header">Celestial Sandbox</span>
+    </div>
+
+    <!-- Live Simulation Stats -->
+    <div class="stats-box">
+      <div class="stat-row"><span>FPS:</span> <strong id="fpsVal">60</strong></div>
+      <div class="stat-row"><span>Bodies:</span> <strong id="bodiesVal">0</strong></div>
+      <div class="stat-row"><span>Total Energy:</span> <strong id="energyVal">0.00</strong></div>
+    </div>
+
+    <!-- Tabs inside panel -->
+    <div class="panel-tabs">
+      <button class="tab-btn active" data-tab="tab-physics">Physics</button>
+      <button class="tab-btn" data-tab="tab-creator">Creator</button>
+      <button class="tab-btn" data-tab="tab-presets">Presets</button>
+    </div>
+
+    <!-- Tab 1: Physics Settings -->
+    <div class="tab-content active" id="tab-physics">
+      <div class="control-group">
+        <label for="gravConstant">Gravitational Constant (G)</label>
+        <div class="slider-row">
+          <input type="range" id="gravConstant" min="0.01" max="10" step="0.01" value="1.00">
+          <span class="slider-val" id="gravConstantVal">1.00</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="timeStep">Time Scale (Sim Speed)</label>
+        <div class="slider-row">
+          <input type="range" id="timeStep" min="0" max="5" step="0.1" value="1.0">
+          <span class="slider-val" id="timeStepVal">1.0x</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="softening">Softening Factor (Prevent Spikes)</label>
+        <div class="slider-row">
+          <input type="range" id="softening" min="1" max="50" step="1" value="15">
+          <span class="slider-val" id="softeningVal">15</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="collisionType">Collision Behavior</label>
+        <select id="collisionType">
+          <option value="merge" selected>Merge (Accretion)</option>
+          <option value="bounce">Elastic Bounce</option>
+          <option value="explode">Vaporize / Explode</option>
+          <option value="none">No Collisions (Overlap)</option>
+        </select>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>Visual Overlays</h3>
+      <div class="checkbox-group">
+        <label><input type="checkbox" id="showTrails" checked> Trajectory Trails</label>
+        <label><input type="checkbox" id="showPrediction" checked> Orbit Path Prediction</label>
+        <label><input type="checkbox" id="showVectors"> Force / Velocity Vectors</label>
+        <label><input type="checkbox" id="showGrid"> Gravitational Grid</label>
+        <label><input type="checkbox" id="showHeatMap"> Thermal Overlay</label>
+      </div>
+      
+      <div class="divider"></div>
+      
+      <div class="btn-group">
+        <button id="pauseBtn" class="action-btn">⏸ Pause</button>
+        <button id="clearBtn" class="action-btn danger">🗑 Clear Space</button>
+      </div>
+    </div>
+
+    <!-- Tab 2: Spawn Creator -->
+    <div class="tab-content" id="tab-creator">
+      <h3>Spawn Preset Configuration</h3>
+      <div class="preset-builder">
+        <div class="control-group">
+          <label for="spawnType">Composition Profile</label>
+          <select id="spawnType">
+            <option value="rocky">Rocky Planet (Silicates/Iron)</option>
+            <option value="iron">Metallic Planet (Iron/Nickel)</option>
+            <option value="ice">Ice Planet (Water/Ammonia)</option>
+            <option value="gas">Gas Giant (Hydrogen/Helium)</option>
+            <option value="star">Star (Nuclear Fusion Reactor)</option>
+            <option value="blackhole">Black Hole (Singularity)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="spawnMass">Initial Mass</label>
+          <div class="slider-row">
+            <input type="range" id="spawnMass" min="1" max="5000" step="10" value="100">
+            <span class="slider-val" id="spawnMassVal">100</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label for="spawnRadius">Radius (Logarithmic)</label>
+          <div class="slider-row">
+            <input type="range" id="spawnRadius" min="2" max="60" step="1" value="12">
+            <span class="slider-val" id="spawnRadiusVal">12</span>
+          </div>
+        </div>
+
+        <div class="chemical-meter-box">
+          <h4>Custom Chemistry Ratios</h4>
+          <div class="chem-slider">
+            <span class="chem-lbl">Rock (Silicate)</span>
+            <input type="range" id="chemRock" min="0" max="100" value="70">
+            <span class="chem-val" id="chemRockVal">70%</span>
+          </div>
+          <div class="chem-slider">
+            <span class="chem-lbl">Metal (Iron)</span>
+            <input type="range" id="chemMetal" min="0" max="100" value="30">
+            <span class="chem-val" id="chemMetalVal">30%</span>
+          </div>
+          <div class="chem-slider">
+            <span class="chem-lbl">Ice (Water/NH3)</span>
+            <input type="range" id="chemIce" min="0" max="100" value="0">
+            <span class="chem-val" id="chemIceVal">0%</span>
+          </div>
+          <div class="chem-slider">
+            <span class="chem-lbl">Gas (H2/He)</span>
+            <input type="range" id="chemGas" min="0" max="100" value="0">
+            <span class="chem-val" id="chemGasVal">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Simulation Presets -->
+    <div class="tab-content" id="tab-presets">
+      <h3>Load Cosmic Systems</h3>
+      <p class="tab-info">Select a system configuration to clear current space and initialize the system.</p>
+      
+      <button class="preset-btn" data-preset="solar">
+        <span class="btn-icon">☀️</span>
+        <div class="btn-text-box">
+          <strong>Inner Solar System</strong>
+          <span>A stable sun with 4 inner terrestrial & gas orbits</span>
+        </div>
+      </button>
+
+      <button class="preset-btn" data-preset="binary">
+        <span class="btn-icon">♊</span>
+        <div class="btn-text-box">
+          <strong>Binary Stars</strong>
+          <span>Two massive stars orbiting their mutual barycenter</span>
+        </div>
+      </button>
+
+      <button class="preset-btn" data-preset="accretion">
+        <span class="btn-icon">🌀</span>
+        <div class="btn-text-box">
+          <strong>Accretion Disk</strong>
+          <span>Dozens of small planetoids colliding into a star</span>
+        </div>
+      </button>
+
+      <button class="preset-btn" data-preset="galaxy">
+        <span class="btn-icon">🌌</span>
+        <div class="btn-text-box">
+          <strong>Galaxy Collision</strong>
+          <span>Two spiral galaxies with hundreds of stars colliding</span>
+        </div>
+      </button>
+
+      <button class="preset-btn" data-preset="lagrange">
+        <span class="btn-icon">🛰️</span>
+        <div class="btn-text-box">
+          <strong>Trojan Orbits</strong>
+          <span>Stable L4 and L5 Lagrange configuration</span>
+        </div>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Right Inspector Panel -->
+  <aside id="inspectorPanel" class="glass-panel right-panel closed">
+    <button id="closeInspectorBtn" class="close-btn">×</button>
+    <div class="panel-header">
+      <h2>INSPECTOR</h2>
+      <span class="sub-header">Object Properties</span>
+    </div>
+
+    <div class="inspector-body">
+      <div class="control-group">
+        <label for="inspectName">Body Identity</label>
+        <input type="text" id="inspectName" class="inspect-input">
+      </div>
+
+      <div class="control-group">
+        <label for="inspectMass">Mass</label>
+        <input type="number" id="inspectMass" class="inspect-input" step="any">
+      </div>
+
+      <div class="control-group">
+        <label for="inspectRadius">Radius</label>
+        <input type="number" id="inspectRadius" class="inspect-input" step="any">
+      </div>
+
+      <div class="checkbox-group">
+        <label><input type="checkbox" id="inspectFixed"> Fixed Space Position</label>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>Dynamic Telemetry</h3>
+      <div class="telemetry-grid">
+        <div class="tel-col"><span>Velocity X:</span> <strong id="telVx">0.00</strong></div>
+        <div class="tel-col"><span>Velocity Y:</span> <strong id="telVy">0.00</strong></div>
+        <div class="tel-col"><span>Kinetic E:</span> <strong id="telKe">0.00</strong></div>
+        <div class="tel-col"><span>Potential E:</span> <strong id="telPe">0.00</strong></div>
+        <div class="tel-col"><span>Surface Temp:</span> <strong id="telTemp">0 K</strong></div>
+        <div class="tel-col"><span>Core Temp:</span> <strong id="telCoreTemp">0 K</strong></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>Chemical Make-up</h3>
+      <div class="chem-breakdown">
+        <div class="chem-bar-row">
+          <span>Rock:</span>
+          <div class="bar-bg"><div class="bar-fill rock-fill" id="barRock" style="width: 0%"></div></div>
+          <span id="txtRock">0%</span>
+        </div>
+        <div class="chem-bar-row">
+          <span>Metal:</span>
+          <div class="bar-bg"><div class="bar-fill metal-fill" id="barMetal" style="width: 0%"></div></div>
+          <span id="txtMetal">0%</span>
+        </div>
+        <div class="chem-bar-row">
+          <span>Ice:</span>
+          <div class="bar-bg"><div class="bar-fill ice-fill" id="barIce" style="width: 0%"></div></div>
+          <span id="txtIce">0%</span>
+        </div>
+        <div class="chem-bar-row">
+          <span>Gas:</span>
+          <div class="bar-bg"><div class="bar-fill gas-fill" id="barGas" style="width: 0%"></div></div>
+          <span id="txtGas">0%</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="btn-group vertical">
+        <button id="spawnMoonBtn" class="action-btn outline">🛰️ Launch Orbiting Moon</button>
+        <button id="vaporizeBtn" class="action-btn danger">💥 Vaporize Body</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Bottom Toolbar -->
+  <nav id="toolbar">
+    <button class="tool-btn active" data-tool="select" title="Inspector / Move: Click planets to inspect or throw them">
+      <span class="tool-icon">👆</span>
+      <span class="tool-label">Select</span>
+    </button>
+    <button class="tool-btn" data-tool="launch" title="Orbit Launcher: Click and drag to launch planets with dynamic prediction">
+      <span class="tool-icon">🚀</span>
+      <span class="tool-label">Launch</span>
+    </button>
+    <button class="tool-btn" data-tool="thruster" title="Gravity Force: Click and drag to apply force fields on bodies">
+      <span class="tool-icon">🌪️</span>
+      <span class="tool-label">Force Field</span>
+    </button>
+    <button class="tool-btn" data-tool="spray" title="Gas Cloud Spray: Click and drag to release volatile chemical dust clouds">
+      <span class="tool-icon">💨</span>
+      <span class="tool-label">Chemical Spray</span>
+    </button>
+    <button class="tool-btn" data-tool="blackhole" title="Black Hole Spawner: Click to open a spacetime singularity">
+      <span class="tool-icon">🕳️</span>
+      <span class="tool-label">Singularity</span>
+    </button>
+    <button class="tool-btn" data-tool="destroy" title="Vaporizer: Click on any celestial body to wipe it from existence">
+      <span class="tool-icon">💥</span>
+      <span class="tool-label">Vaporizer</span>
+    </button>
+  </nav>
+
+  <!-- Instructions Overlay (Dismissable) -->
+  <div id="welcomeOverlay" class="welcome-overlay glass-panel">
+    <h2>ASTROPHYSICS SANDBOX</h2>
+    <p>Welcome to the ultimate cosmic mechanics & alchemy laboratory. Here's how to interact with your universe:</p>
+    <ul>
+      <li><strong>Orbit Launcher (🚀)</strong>: Drag and fling to create orbiting systems. The dotted line predicts its path!</li>
+      <li><strong>Select (👆)</strong>: Click any body to review telemetry, edit parameters, or fire a moon!</li>
+      <li><strong>Force Field (🌪️)</strong>: Click and drag on screen to apply gravitational suction/repulsion.</li>
+      <li><strong>Chemical Spray (💨)</strong>: Spray volatile dust clouds. If they gather enough gas, stars are born!</li>
+      <li><strong>Singularity (🕳️)</strong>: Place black holes that bend light and pull all particles in.</li>
+    </ul>
+    <button id="welcomeDismiss" class="action-btn">Enter Cosmos</button>
+  </div>
+
+  <!-- Loading simulation modules -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
