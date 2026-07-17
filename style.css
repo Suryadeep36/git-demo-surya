@@ -1,0 +1,721 @@
+/* Reset and base setup */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #03050f;
+  color: #e2e8f0;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+}
+
+/* Deep space canvas */
+#spaceCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Glassmorphism panel base */
+.glass-panel {
+  background: rgba(8, 11, 28, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  color: #e2e8f0;
+  z-index: 10;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Left panel style */
+.left-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  bottom: 100px;
+  width: 340px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Right panel style */
+.right-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  bottom: 100px;
+  width: 320px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.right-panel.closed {
+  transform: translateX(calc(100% + 40px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Panel Header styling */
+.panel-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.panel-header h1, .panel-header h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #00f0ff, #ff00a0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.panel-header .sub-header {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #718096;
+}
+
+/* Close button for inspector */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #a0aec0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 12;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #ff0055;
+}
+
+/* Live stats indicator */
+.stats-box {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(0, 240, 255, 0.05);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  padding: 8px 16px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+}
+
+.stat-row strong {
+  color: #00f0ff;
+  text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+}
+
+/* Tabs switcher */
+.panel-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #718096;
+  padding: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tab-btn.active {
+  color: #00f0ff;
+  border-bottom-color: #00f0ff;
+  background: rgba(0, 240, 255, 0.03);
+}
+
+/* Tab contents area */
+.tab-content {
+  display: none;
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Styled Scrollbars */
+.tab-content::-webkit-scrollbar,
+.inspector-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-track,
+.inspector-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.tab-content::-webkit-scrollbar-thumb,
+.inspector-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover,
+.inspector-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.3);
+}
+
+/* Controls layout */
+.control-group {
+  margin-bottom: 16px;
+}
+
+.control-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: #a0aec0;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  min-width: 45px;
+  text-align: right;
+  color: #00f0ff;
+}
+
+/* Styling native range inputs */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Select option boxes */
+select {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e2e8f0;
+  outline: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+select:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+}
+
+select option {
+  background-color: #0d1127;
+  color: #e2e8f0;
+}
+
+/* Checkbox container groups */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: #cbd5e0;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  accent-color: #00f0ff;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+/* Divides elements nicely */
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 16px 0;
+}
+
+h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #a0aec0;
+  margin-bottom: 12px;
+}
+
+/* Generic buttons style */
+.action-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.action-btn.danger {
+  background: rgba(255, 0, 80, 0.15);
+  border-color: rgba(255, 0, 80, 0.3);
+  color: #ff3b70;
+}
+
+.action-btn.danger:hover {
+  background: rgba(255, 0, 80, 0.25);
+  box-shadow: 0 0 10px rgba(255, 0, 80, 0.2);
+}
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-group.vertical {
+  flex-direction: column;
+}
+
+/* Preset spawner builders */
+.chemical-meter-box {
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 14px;
+}
+
+.chemical-meter-box h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #718096;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.chem-slider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+}
+
+.chem-lbl {
+  min-width: 90px;
+  color: #a0aec0;
+}
+
+.chem-slider input[type="range"] {
+  height: 4px;
+  margin: 0 8px;
+}
+
+.chem-val {
+  min-width: 32px;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* Chemical colors theme values */
+#chemRock::-webkit-slider-thumb { background: #b08a6a; box-shadow: 0 0 5px #b08a6a; }
+#chemMetal::-webkit-slider-thumb { background: #8892b0; box-shadow: 0 0 5px #8892b0; }
+#chemIce::-webkit-slider-thumb { background: #8cd9ff; box-shadow: 0 0 5px #8cd9ff; }
+#chemGas::-webkit-slider-thumb { background: #db7cff; box-shadow: 0 0 5px #db7cff; }
+
+/* Preset buttons lists */
+.preset-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.preset-btn:hover {
+  background: rgba(0, 240, 255, 0.05);
+  border-color: rgba(0, 240, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  font-size: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-text-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-text-box strong {
+  font-size: 0.85rem;
+  color: #cbd5e0;
+}
+
+.btn-text-box span {
+  font-size: 0.7rem;
+  color: #718096;
+}
+
+/* Inspector styles */
+.inspector-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.inspect-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.inspect-input:focus {
+  border-color: #ff00a0;
+}
+
+/* Telemetry display grid */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.tel-col {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.tel-col span {
+  font-size: 0.65rem;
+  color: #718096;
+  text-transform: uppercase;
+}
+
+.tel-col strong {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  color: #ff00a0;
+  margin-top: 4px;
+}
+
+/* Chemical breakdown rows */
+.chem-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chem-bar-row {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.chem-bar-row span:first-child {
+  width: 48px;
+  color: #a0aec0;
+}
+
+.bar-bg {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  margin: 0 10px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.rock-fill { background: #b08a6a; }
+.metal-fill { background: #8892b0; }
+.ice-fill { background: #8cd9ff; }
+.gas-fill { background: #db7cff; }
+
+.chem-bar-row span:last-child {
+  width: 32px;
+  text-align: right;
+  font-weight: 600;
+  color: #cbd5e0;
+}
+
+/* Action button variations */
+.action-btn.outline {
+  border: 1px solid #00f0ff;
+  background: rgba(0, 240, 255, 0.05);
+  color: #00f0ff;
+}
+
+.action-btn.outline:hover {
+  background: rgba(0, 240, 255, 0.15);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+/* Sound floating widget */
+.sound-btn {
+  position: absolute;
+  top: 20px;
+  left: 380px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 20px;
+  background: rgba(8, 11, 28, 0.65);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sound-btn:hover {
+  border-color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.sound-btn.muted {
+  color: #718096;
+}
+
+/* Toolbar overlay footer */
+#toolbar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  background: rgba(8, 11, 28, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  padding: 6px 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+.tool-btn {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #718096;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 20px;
+}
+
+.tool-btn:hover {
+  color: #e2e8f0;
+  transform: scale(1.08) translateY(-2px);
+}
+
+.tool-btn.active {
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.08);
+  box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.05);
+}
+
+.tool-icon {
+  font-size: 1.3rem;
+  margin-bottom: 2px;
+}
+
+.tool-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Fullscreen Instruction modal panel */
+.welcome-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  border-radius: 20px;
+  padding: 30px;
+  z-index: 100;
+  text-align: left;
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+.welcome-overlay.dismissed {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -45%) scale(0.95);
+}
+
+.welcome-overlay h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 3px;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, #00f0ff, #ff00a0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+}
+
+.welcome-overlay p {
+  font-size: 0.85rem;
+  color: #cbd5e0;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.welcome-overlay ul {
+  list-style: none;
+  margin-bottom: 25px;
+}
+
+.welcome-overlay li {
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+  color: #a0aec0;
+  line-height: 1.4;
+  padding-left: 10px;
+  border-left: 2px solid #00f0ff;
+}
+
+.welcome-overlay button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #00f0ff, #ff00a0);
+  border: none;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  color: #fff;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+  transition: all 0.2s;
+}
+
+.welcome-overlay button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4), 0 0 10px rgba(255, 0, 160, 0.3);
+}
+
+/* Adjustments for responsive sidebars */
+@media (max-width: 1024px) {
+  .left-panel {
+    width: 280px;
+  }
+  .right-panel {
+    width: 260px;
+  }
+  .sound-btn {
+    left: 320px;
+  }
+}
